@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">CustomStatusManager</string>
+    <string name="common_loading_failure">加载失败，点击重试</string>
+    <string name="fragment_mysubscribe_to_login">请先点我去登录哟</string>
+    <string name="fragment_mysubscribe_to_subscribe">两个黄鹂鸣翠柳，一个关注也没有</string>
+    <string name="common_loading">加载中…</string>
+</resources>

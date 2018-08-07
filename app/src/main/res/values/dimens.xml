@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="fragment_mysubscribe_height">178dp</dimen>
+    <dimen name="divider_height">0.33dp</dimen>
+
+</resources>
