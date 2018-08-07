@@ -3,12 +3,6 @@ package com.lishijie.zoujuequn;
 import android.content.Context;
 import android.widget.Toast;
 
-/**
- * Toast 工具类
- *
- * @author mafei
- * @date 2017/12/22
- */
 
 public class ToastUtils {
     private static Toast mToast;
