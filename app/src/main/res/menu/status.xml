@@ -20,4 +20,9 @@
         android:title="加载成功"
         app:showAsAction="never"/>
 
+    <item
+        android:id="@+id/menu_status_unlogin"
+        android:title="未登陆"
+        app:showAsAction="never"/>
+
 </menu>

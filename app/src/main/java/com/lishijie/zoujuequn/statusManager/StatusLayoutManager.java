@@ -23,6 +23,7 @@ public class StatusLayoutManager {
     private static final int DEFAULT_LOADING_LAYOUT_ID = R.layout.layout_status_layout_manager_loading;
     private static final int DEFAULT_EMPTY_LAYOUT_ID = R.layout.layout_status_layout_manager_empty;
     private static final int DEFAULT_ERROR_LAYOUT_ID = R.layout.layout_status_layout_manager_error;
+    private static final int DEFAULT_UNLOGIN_LAYOUT_ID = R.layout.layout_status_layout_manager_unlogin;
 
     /**
      * 默认布局中可点击的 view ID
@@ -30,6 +31,7 @@ public class StatusLayoutManager {
     private static final int DEFAULT_LOADING_CLICKED_ID = R.id.tv_status_loading_content;
     private static final int DEFAULT_EMPTY_CLICKED_ID = R.id.tv_status_empty_content;
     private static final int DEFAULT_ERROR_CLICKED_ID = R.id.tv_status_error_content;
+    private static final int DEFAULT_UNLOGIN_CLICKED_ID = R.id.tv_status_unlogin_content;
 
     /**
      * 默认文字颜色
@@ -37,6 +39,7 @@ public class StatusLayoutManager {
     private static final int DEFAULT_ERROR_TEXT_COLOR = android.R.color.white;
     private static final int DEFAULT_LOADING_TEXT_COLOR = android.R.color.white;
     private static final int DEFAULT_EMPTY_TEXT_COLOR = android.R.color.white;
+    private static final int DEFAULT_UNLOGIN_TEXT_COLOR = android.R.color.white;
 
     /**
      * 默认背景颜色
@@ -44,6 +47,7 @@ public class StatusLayoutManager {
     private static final int DEFAULT_ERROR_BACKGROUND_COLOR = android.R.color.white;
     private static final int DEFAULT_EMPTY_BACKGROUND_COLOR = android.R.color.white;
     private static final int DEFAULT_LOADING_BACKGROUND_COLOR = android.R.color.white;
+    private static final int DEFAULT_UNLOGIN_BACKGROUND_COLOR = android.R.color.white;
 
     private View contentLayout;
 
@@ -66,6 +70,20 @@ public class StatusLayoutManager {
     @DrawableRes
     private int emptyImgID;
 
+
+    @IdRes
+    private int unLoginClickViewId;
+    @LayoutRes
+    private int unLoginLayoutID;
+    private View unLoginLayout;
+    private String unLoginText;
+    private String unLoginClickViewText;
+    private int unLoginClickViewTextColor;
+    private boolean isUnLoginClickViewVisible;
+    @DrawableRes
+    private int unLoginImgID;
+
+
     @IdRes
     private int errorClickViewId;
     @LayoutRes
@@ -86,6 +104,7 @@ public class StatusLayoutManager {
     private int defaultBackgroundErrorColor;
     private int defaultBackgroundEmptyColor;
     private int defaultBackgroundLoadingColor;
+    private int defaultBackgroundUnLoginColor;
 
     private OnStatusChildClickListener onStatusChildClickListener;
 
@@ -100,6 +119,16 @@ public class StatusLayoutManager {
         this.loadingLayout = builder.loadingLayout;
         this.loadingText = builder.loadingText;
 
+        this.unLoginClickViewId = builder.unLoginClickViewId;
+        this.unLoginLayoutID = builder.unLoginLayoutID;
+        this.unLoginLayout = builder.unLoginLayout;
+        this.unLoginText = builder.unLoginText;
+        this.unLoginClickViewText = builder.unLoginClickViewText;
+        this.unLoginClickViewTextColor = builder.unLoginClickViewTextColor;
+        this.isUnLoginClickViewVisible = builder.isUnLoginClickViewVisible;
+        this.unLoginImgID = builder.unLoginImgID;
+
+
         this.emptyClickViewId = builder.emptyClickViewId;
         this.emptyLayoutID = builder.emptyLayoutID;
         this.emptyLayout = builder.emptyLayout;
@@ -108,6 +137,7 @@ public class StatusLayoutManager {
         this.emptyClickViewTextColor = builder.emptyClickViewTextColor;
         this.isEmptyClickViewVisible = builder.isEmptyClickViewVisible;
         this.emptyImgID = builder.emptyImgID;
+
 
         this.errorClickViewId = builder.errorClickViewId;
         this.errorLayoutID = builder.errorLayoutID;
@@ -126,6 +156,7 @@ public class StatusLayoutManager {
         this.defaultBackgroundErrorColor = builder.defaultBackgroundErrorColor;
         this.defaultBackgroundEmptyColor = builder.defaultBackgroundEmptyColor;
         this.defaultBackgroundLoadingColor = builder.defaultBackgroundLoadingColor;
+        this.defaultBackgroundUnLoginColor = builder.defaultBackgroundUnLoginColor;
 
         this.onStatusChildClickListener = builder.onStatusChildClickListener;
 
@@ -220,6 +251,84 @@ public class StatusLayoutManager {
         if (animationDrawable != null) {
             animationDrawable.stop();
         }
+    }
+
+
+
+    //------------------未登陆布局------------------
+
+
+
+    /**
+     * 创建未登陆布局
+     */
+    private void createUnLoginLayout() {
+        if (unLoginLayout == null) {
+            unLoginLayout = inflate(unLoginLayoutID);
+        }
+        if (unLoginLayoutID == DEFAULT_UNLOGIN_LAYOUT_ID) {
+            unLoginLayout.setBackgroundColor(defaultBackgroundUnLoginColor);
+        }
+
+        // 点击事件回调
+        View view = unLoginLayout.findViewById(unLoginClickViewId);
+        if (view != null && onStatusChildClickListener != null) {
+            // 设置点击按钮点击时事件回调
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    onStatusChildClickListener.onUnLoginChildClick(view);
+                }
+            });
+        }
+
+        // 设置未登陆布局的提示文本
+        if (!TextUtils.isEmpty(unLoginText)) {
+            TextView emptyTextView = unLoginLayout.findViewById(R.id.tv_status_empty_content);
+            if (emptyTextView != null) {
+                emptyTextView.setText(unLoginText);
+            }
+        }
+
+        // 设置未登陆布局的图片
+        if (unLoginImgID > 0) {
+            ImageView unLoginImageView = unLoginLayout.findViewById(R.id.iv_status_unlogin_img);
+            if (unLoginImageView != null) {
+                unLoginImageView.setImageResource(unLoginImgID);
+            }
+        }
+
+        TextView unLoginClickViewTextView = unLoginLayout.findViewById(DEFAULT_UNLOGIN_CLICKED_ID);
+        if (unLoginClickViewTextView != null) {
+            // 设置点击按钮的文本和可见性
+            if (isUnLoginClickViewVisible) {
+                unLoginClickViewTextView.setVisibility(View.VISIBLE);
+                if (!TextUtils.isEmpty(unLoginClickViewText)) {
+                    unLoginClickViewTextView.setText(unLoginClickViewText);
+                }
+                unLoginClickViewTextView.setTextColor(unLoginClickViewTextColor);
+            } else {
+                unLoginClickViewTextView.setVisibility(View.GONE);
+            }
+        }
+    }
+
+    /**
+     * 获取未登陆布局
+     *
+     * @return 未登陆布局
+     */
+    public View getUnLoginLayout() {
+        createUnLoginLayout();
+        return unLoginLayout;
+    }
+
+    /**
+     * 显示未登陆布局
+     */
+    public void showUnLoginLayout() {
+        createUnLoginLayout();
+        replaceLayoutHelper.showStatusLayout(unLoginLayout);
     }
 
 
@@ -399,6 +508,19 @@ public class StatusLayoutManager {
         @DrawableRes
         private int emptyImgID;
 
+
+        @IdRes
+        private int unLoginClickViewId;
+        @LayoutRes
+        private int unLoginLayoutID;
+        private View unLoginLayout;
+        private String unLoginText;
+        private String unLoginClickViewText;
+        private int unLoginClickViewTextColor;
+        private boolean isUnLoginClickViewVisible;
+        @DrawableRes
+        private int unLoginImgID;
+
         @IdRes
         private int errorClickViewId;
         @LayoutRes
@@ -418,6 +540,7 @@ public class StatusLayoutManager {
         private int defaultBackgroundLoadingColor;
         private int defaultBackgroundErrorColor;
         private int defaultBackgroundEmptyColor;
+        private int defaultBackgroundUnLoginColor;
 
 
         private OnStatusChildClickListener onStatusChildClickListener;
@@ -432,13 +555,17 @@ public class StatusLayoutManager {
             // 设置默认布局
             this.loadingLayoutID = DEFAULT_LOADING_LAYOUT_ID;
             this.emptyLayoutID = DEFAULT_EMPTY_LAYOUT_ID;
+            this.unLoginLayoutID = DEFAULT_UNLOGIN_LAYOUT_ID;
             this.errorLayoutID = DEFAULT_ERROR_LAYOUT_ID;
             // 设置默认点击点击view id
             this.emptyClickViewId = DEFAULT_EMPTY_CLICKED_ID;
+            this.unLoginClickViewId = DEFAULT_UNLOGIN_CLICKED_ID;
             this.errorClickViewId = DEFAULT_ERROR_CLICKED_ID;
             // 设置默认点击按钮属性
             this.isEmptyClickViewVisible = true;
             this.emptyClickViewTextColor = contentLayout.getContext().getResources().getColor(DEFAULT_EMPTY_TEXT_COLOR);
+            this.isUnLoginClickViewVisible = true;
+            this.unLoginClickViewTextColor = contentLayout.getContext().getResources().getColor(DEFAULT_UNLOGIN_TEXT_COLOR);
             this.isErrorClickViewVisible = true;
             this.errorClickViewTextColor = contentLayout.getContext().getResources().getColor(DEFAULT_ERROR_TEXT_COLOR);
             this.isLoadingClickViewVisible = true;
@@ -447,6 +574,7 @@ public class StatusLayoutManager {
             this.defaultBackgroundLoadingColor = contentLayout.getContext().getResources().getColor(DEFAULT_LOADING_BACKGROUND_COLOR);
             this.defaultBackgroundErrorColor = contentLayout.getContext().getResources().getColor(DEFAULT_ERROR_BACKGROUND_COLOR);
             this.defaultBackgroundEmptyColor = contentLayout.getContext().getResources().getColor(DEFAULT_EMPTY_BACKGROUND_COLOR);
+            this.defaultBackgroundUnLoginColor = contentLayout.getContext().getResources().getColor(DEFAULT_UNLOGIN_BACKGROUND_COLOR);
         }
 
 
@@ -664,6 +792,138 @@ public class StatusLayoutManager {
             this.defaultBackgroundEmptyColor = defaultEmptyBackgroundColor;
             return this;
         }
+
+
+
+
+        //------------------未登录布局----------------------
+
+
+
+        /**
+         * 设置未登录布局提示文本
+         *
+         * @param unLoginText 空数据布局提示文本
+         * @return 状态布局 Build 对象
+         */
+        public Builder setUnLoginText(String unLoginText) {
+            this.unLoginText = unLoginText;
+            return this;
+        }
+
+        /**
+         * 设置未登录布局提示文本
+         *
+         * @param unLoginTextStrID 空数据布局提示文本 ID
+         * @return 状态布局 Build 对象
+         */
+        public Builder setUnLoginText(@StringRes int unLoginTextStrID) {
+            this.unLoginText = contentLayout.getContext().getResources().getString(unLoginTextStrID);
+            return this;
+        }
+
+
+
+        /**
+         * 设置未登录布局
+         *
+         * @param unLoginLayoutResId 空数据布局 ID
+         * @return 状态布局 Build 对象
+         */
+        public Builder setUnLoginLayout(@LayoutRes int unLoginLayoutResId) {
+            this.unLoginLayoutID = unLoginLayoutResId;
+            return this;
+        }
+
+        /**
+         * 设置未登录布局
+         *
+         * @param unLoginLayout 空数据布局
+         * @return 状态布局 Build 对象
+         */
+        public Builder setUnLoginLayout(@NonNull View unLoginLayout) {
+            this.unLoginLayout = unLoginLayout;
+            return this;
+        }
+
+        /**
+         * 设置未登录布局点击按钮 ID
+         *
+         * @param unLoginClickViewResId 空数据布局点击按钮 ID
+         * @return 状态布局 Build 对象
+         */
+        public Builder setUnLoginClickViewID(@IdRes int unLoginClickViewResId) {
+            this.unLoginClickViewId = unLoginClickViewResId;
+            return this;
+        }
+
+        /**
+         * 设置默未登录布局点击按钮文本
+         *
+         * @param unLoginClickViewText 点击按钮文本
+         * @return 状态布局 Build 对象
+         */
+        public Builder setUnLoginClickViewText(String unLoginClickViewText) {
+            this.unLoginClickViewText = unLoginClickViewText;
+            return this;
+        }
+
+        /**
+         * 设置未登录布局点击按钮文本
+         *
+         * @param unLoginClickViewTextID 点击按钮文本 ID
+         * @return 状态布局 Build 对象
+         */
+        public Builder setUnLoginClickViewText(@StringRes int unLoginClickViewTextID) {
+            this.unLoginClickViewText = contentLayout.getContext().getResources().getString(unLoginClickViewTextID);
+            return this;
+        }
+
+        /**
+         * 设置未登录布局点击按钮文本颜色
+         *
+         * @param unLoginClickViewTextColor 点击按钮文本颜色
+         * @return 状态布局 Build 对象
+         */
+        public Builder setUnLoginTextViewColor(int unLoginClickViewTextColor) {
+            this.unLoginClickViewTextColor = unLoginClickViewTextColor;
+            return this;
+        }
+
+        /**
+         * 设置未登录布局点击按钮是否可见
+         *
+         * @param isUnLoginClickViewVisible true：可见 false：不可见
+         * @return 状态布局 Build 对象
+         */
+        public Builder setUnLoginClickViewVisible(boolean isUnLoginClickViewVisible) {
+            this.isUnLoginClickViewVisible = isUnLoginClickViewVisible;
+            return this;
+        }
+
+        /**
+         * 设置未登录布局图片
+         *
+         * @param unLoginImgID 空数据布局图片 ID
+         * @return 状态布局 Build 对象
+         */
+        public Builder setUnLoginImg(@DrawableRes int unLoginImgID) {
+            this.unLoginImgID = unLoginImgID;
+            return this;
+        }
+
+
+        /**
+         * 设置未登录布局的背景颜色，包括加载中、空数据和出错布局
+         *
+         * @param defaultUnLoginBackgroundColor 默认布局的背景颜色
+         * @return 状态布局 Build 对象
+         */
+        public Builder setUnLoginBackgroundColor(int defaultUnLoginBackgroundColor) {
+            this.defaultBackgroundUnLoginColor = defaultUnLoginBackgroundColor;
+            return this;
+        }
+
 
 
 

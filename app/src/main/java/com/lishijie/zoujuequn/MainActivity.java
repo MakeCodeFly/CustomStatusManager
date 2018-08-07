@@ -58,17 +58,21 @@ public class MainActivity extends AppCompatActivity implements OnStatusChildClic
                 .setLoadingLayout(R.layout.layout_status_layout_manager_loading)
                 .setEmptyLayout(R.layout.layout_status_layout_manager_empty)
                 .setErrorLayout(R.layout.layout_status_layout_manager_error)
+                .setUnLoginLayout(R.layout.layout_status_layout_manager_unlogin)
 
                 .setEmptyClickViewID(R.id.bt_status_empty_click)
                 .setErrorClickViewID(R.id.loading_failure_ll)
+                .setUnLoginClickViewID(R.id.ll_status_unlogin_parent)
 
                 .setLoadingViewTextColor(ContextCompat.getColor(this,R.color.color_0AD8F0))
                 .setEmptyViewTextColor(ContextCompat.getColor(this,R.color.white_alpha_20))
+                .setUnLoginTextViewColor(ContextCompat.getColor(this,R.color.white_alpha_20))
                 .setErrorViewTextColor(ContextCompat.getColor(this,R.color.color_5ecdcd))
 
                 .setLoadingBackgroundColor(ContextCompat.getColor(this,R.color.transparent))
                 .setErrorBackgroundColor(ContextCompat.getColor(this,R.color.color_bg_loading))
                 .setEmptyBackgroundColor(ContextCompat.getColor(this,R.color.color_bg_loading))
+                .setUnLoginBackgroundColor(ContextCompat.getColor(this,R.color.color_bg_loading))
 
                 .build();
     }
@@ -100,6 +104,11 @@ public class MainActivity extends AppCompatActivity implements OnStatusChildClic
                 statusLayoutManager.showSuccessLayout();
                 break;
 
+                case R.id.menu_status_unlogin:
+                // 加载成功，显示原布局
+                statusLayoutManager.showUnLoginLayout();
+                break;
+
         }
         return super.onOptionsItemSelected(item);
     }
@@ -114,6 +123,13 @@ public class MainActivity extends AppCompatActivity implements OnStatusChildClic
     @Override
     public void onErrorChildClick(View view) {
         ToastUtils.show(MainActivity.this, "出错状态布局");
+        statusLayoutManager.showLoadingLayout();
+        getData(1500);
+    }
+
+    @Override
+    public void onUnLoginChildClick(View view) {
+        ToastUtils.show(MainActivity.this, "未登陆状态布局");
         statusLayoutManager.showLoadingLayout();
         getData(1500);
     }

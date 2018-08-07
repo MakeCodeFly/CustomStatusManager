@@ -19,4 +19,11 @@ public interface OnStatusChildClickListener {
      */
     void onErrorChildClick(View view);
 
+    /**
+     * 未登陆布局子 View 被点击
+     *
+     * @param view 被点击的 View
+     */
+    void onUnLoginChildClick(View view);
+
 }
