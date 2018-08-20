@@ -8,5 +8,6 @@
     <color name="color_bg_loading">#1F2128</color>
     <color name="color_5ecdcd">#5ecdcd</color>
     <color name="color_0AD8F0">#0AD8F0</color>
+    <color name="color_212329">#212329</color>
     <color name="transparent">@android:color/transparent</color>
 </resources>

@@ -1,5 +1,7 @@
 package com.lishijie.zoujuequn;
 
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -22,7 +24,6 @@ import com.lishijie.zoujuequn.statusManager.StatusLayoutManager;
 public class MainActivity extends AppCompatActivity implements OnStatusChildClickListener {
 
     private StatusLayoutManager statusLayoutManager;
-
     private LinearLayout llRoot;
     private TextView mTvChildView;
 
@@ -60,9 +61,9 @@ public class MainActivity extends AppCompatActivity implements OnStatusChildClic
                 .setErrorLayout(R.layout.layout_status_layout_manager_error)
                 .setUnLoginLayout(R.layout.layout_status_layout_manager_unlogin)
 
-                .setEmptyClickViewID(R.id.bt_status_empty_click)
-                .setErrorClickViewID(R.id.loading_failure_ll)
-                .setUnLoginClickViewID(R.id.ll_status_unlogin_parent)
+                .setEmptyClickViewID(R.id.parent_status_empty_click)
+                .setErrorClickViewID(R.id.parent_status_error_click)
+                .setUnLoginClickViewID(R.id.parent_status_unlogin_click)
 
                 .setLoadingViewTextColor(ContextCompat.getColor(this,R.color.color_0AD8F0))
                 .setEmptyViewTextColor(ContextCompat.getColor(this,R.color.white_alpha_20))
@@ -84,6 +85,7 @@ public class MainActivity extends AppCompatActivity implements OnStatusChildClic
         return true;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {

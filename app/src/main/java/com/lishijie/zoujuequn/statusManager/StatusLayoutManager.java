@@ -1,11 +1,15 @@
 package com.lishijie.zoujuequn.statusManager;
 
 import android.graphics.drawable.AnimationDrawable;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.annotation.StringRes;
+import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,10 +32,10 @@ public class StatusLayoutManager {
     /**
      * 默认布局中可点击的 view ID
      */
-    private static final int DEFAULT_LOADING_CLICKED_ID = R.id.tv_status_loading_content;
-    private static final int DEFAULT_EMPTY_CLICKED_ID = R.id.tv_status_empty_content;
-    private static final int DEFAULT_ERROR_CLICKED_ID = R.id.tv_status_error_content;
-    private static final int DEFAULT_UNLOGIN_CLICKED_ID = R.id.tv_status_unlogin_content;
+    private static final int DEFAULT_LOADING_CLICKED_ID = R.id.parent_status_loading_click;
+    private static final int DEFAULT_EMPTY_CLICKED_ID = R.id.parent_status_empty_click;
+    private static final int DEFAULT_ERROR_CLICKED_ID = R.id.parent_status_error_click;
+    private static final int DEFAULT_UNLOGIN_CLICKED_ID = R.id.parent_status_unlogin_click;
 
     /**
      * 默认文字颜色
@@ -48,6 +52,7 @@ public class StatusLayoutManager {
     private static final int DEFAULT_EMPTY_BACKGROUND_COLOR = android.R.color.white;
     private static final int DEFAULT_LOADING_BACKGROUND_COLOR = android.R.color.white;
     private static final int DEFAULT_UNLOGIN_BACKGROUND_COLOR = android.R.color.white;
+    private static final int DEFAULT_DRAWABLE = android.R.drawable.screen_background_dark;
 
     private View contentLayout;
 
@@ -105,6 +110,15 @@ public class StatusLayoutManager {
     private int defaultBackgroundEmptyColor;
     private int defaultBackgroundLoadingColor;
     private int defaultBackgroundUnLoginColor;
+    private boolean isShowErrorBgColor;
+    private boolean isShowEmptyBgColor;
+    private boolean isShowUnLoginBgColor;
+    private Drawable defaultBackgroundErrorDrawable;
+    private Drawable defaultBackgroundEmptyDrawable;
+    private Drawable defaultBackgroundUnLoginDrawable;
+    private boolean isShowErrorBgDrawable;
+    private boolean isShowEmptyBgDrawable;
+    private boolean isShowUnLoginBgDrawable;
 
     private OnStatusChildClickListener onStatusChildClickListener;
 
@@ -158,6 +172,18 @@ public class StatusLayoutManager {
         this.defaultBackgroundLoadingColor = builder.defaultBackgroundLoadingColor;
         this.defaultBackgroundUnLoginColor = builder.defaultBackgroundUnLoginColor;
 
+        this.defaultBackgroundErrorDrawable = builder.defaultBackgroundErrorDrawable;
+        this.defaultBackgroundEmptyDrawable = builder.defaultBackgroundEmptyDrawable;
+        this.defaultBackgroundUnLoginDrawable = builder.defaultBackgroundUnLoginDrawable;
+
+
+        this.isShowErrorBgColor = builder.isShowErrorBgColor;
+        this.isShowEmptyBgColor = builder.isShowEmptyBgColor;
+        this.isShowUnLoginBgColor = builder.isShowUnLoginBgColor;
+        this.isShowErrorBgDrawable = builder.isShowErrorBgDrawable;
+        this.isShowEmptyBgDrawable = builder.isShowEmptyBgDrawable;
+        this.isShowUnLoginBgDrawable = builder.isShowUnLoginBgDrawable;
+
         this.onStatusChildClickListener = builder.onStatusChildClickListener;
 
         this.replaceLayoutHelper = new ReplaceLayoutHelper(contentLayout);
@@ -193,15 +219,13 @@ public class StatusLayoutManager {
         if (loadingLayoutID == DEFAULT_LOADING_LAYOUT_ID) {
             loadingLayout.setBackgroundColor(defaultBackgroundLoadingColor);
         }
+        TextView loadingTextView = loadingLayout.findViewById(R.id.tv_status_loading_content);
         if (!TextUtils.isEmpty(loadingText)) {
-            TextView loadingTextView = loadingLayout.findViewById(DEFAULT_LOADING_CLICKED_ID);
             if (loadingTextView != null) {
                 loadingTextView.setText(loadingText);
             }
         }
 
-
-        TextView loadingTextView = loadingLayout.findViewById(DEFAULT_LOADING_CLICKED_ID);
         if (loadingTextView != null) {
             // 设置点击按钮的文本和可见性
             if (isLoadingClickViewVisible) {
@@ -216,7 +240,7 @@ public class StatusLayoutManager {
         }
 
         ImageView loadingImageView = loadingLayout.findViewById(R.id.iv_status_loading_img);
-        loadingImageView.setBackgroundResource(R.drawable.loading_layout);
+        loadingImageView.setBackgroundResource(R.drawable.loading_animation);
         animationDrawable = (AnimationDrawable) loadingImageView.getBackground();
         if (animationDrawable == null) {
             animationDrawable = (AnimationDrawable) loadingImageView.getDrawable();
@@ -243,7 +267,6 @@ public class StatusLayoutManager {
     }
 
 
-
     /**
      * 隐藏加载中布局
      */
@@ -254,20 +277,23 @@ public class StatusLayoutManager {
     }
 
 
-
     //------------------未登陆布局------------------
-
 
 
     /**
      * 创建未登陆布局
      */
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     private void createUnLoginLayout() {
         if (unLoginLayout == null) {
             unLoginLayout = inflate(unLoginLayoutID);
         }
-        if (unLoginLayoutID == DEFAULT_UNLOGIN_LAYOUT_ID) {
+        if (unLoginLayoutID == DEFAULT_UNLOGIN_LAYOUT_ID && isShowUnLoginBgColor) {
             unLoginLayout.setBackgroundColor(defaultBackgroundUnLoginColor);
+        }
+
+        if (unLoginLayoutID == DEFAULT_UNLOGIN_LAYOUT_ID && isShowUnLoginBgDrawable) {
+            unLoginLayout.setBackground(defaultBackgroundUnLoginDrawable);
         }
 
         // 点击事件回调
@@ -281,12 +307,11 @@ public class StatusLayoutManager {
                 }
             });
         }
-
+        TextView unLoginTextView = unLoginLayout.findViewById(R.id.tv_status_empty_content);
         // 设置未登陆布局的提示文本
         if (!TextUtils.isEmpty(unLoginText)) {
-            TextView emptyTextView = unLoginLayout.findViewById(R.id.tv_status_empty_content);
-            if (emptyTextView != null) {
-                emptyTextView.setText(unLoginText);
+            if (unLoginTextView != null) {
+                unLoginTextView.setText(unLoginText);
             }
         }
 
@@ -298,17 +323,16 @@ public class StatusLayoutManager {
             }
         }
 
-        TextView unLoginClickViewTextView = unLoginLayout.findViewById(DEFAULT_UNLOGIN_CLICKED_ID);
-        if (unLoginClickViewTextView != null) {
+        if (unLoginTextView != null) {
             // 设置点击按钮的文本和可见性
             if (isUnLoginClickViewVisible) {
-                unLoginClickViewTextView.setVisibility(View.VISIBLE);
+                unLoginTextView.setVisibility(View.VISIBLE);
                 if (!TextUtils.isEmpty(unLoginClickViewText)) {
-                    unLoginClickViewTextView.setText(unLoginClickViewText);
+                    unLoginTextView.setText(unLoginClickViewText);
                 }
-                unLoginClickViewTextView.setTextColor(unLoginClickViewTextColor);
+                unLoginTextView.setTextColor(unLoginClickViewTextColor);
             } else {
-                unLoginClickViewTextView.setVisibility(View.GONE);
+                unLoginTextView.setVisibility(View.GONE);
             }
         }
     }
@@ -318,6 +342,7 @@ public class StatusLayoutManager {
      *
      * @return 未登陆布局
      */
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     public View getUnLoginLayout() {
         createUnLoginLayout();
         return unLoginLayout;
@@ -326,27 +351,30 @@ public class StatusLayoutManager {
     /**
      * 显示未登陆布局
      */
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     public void showUnLoginLayout() {
         createUnLoginLayout();
         replaceLayoutHelper.showStatusLayout(unLoginLayout);
     }
 
 
-
-
     //------------------空数据布局------------------
-
 
 
     /**
      * 创建空数据布局
      */
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     private void createEmptyLayout() {
         if (emptyLayout == null) {
             emptyLayout = inflate(emptyLayoutID);
         }
-        if (emptyLayoutID == DEFAULT_EMPTY_LAYOUT_ID) {
+        if (emptyLayoutID == DEFAULT_EMPTY_LAYOUT_ID && isShowEmptyBgColor) {
             emptyLayout.setBackgroundColor(defaultBackgroundEmptyColor);
+        }
+
+        if (emptyLayoutID == DEFAULT_EMPTY_LAYOUT_ID && isShowEmptyBgDrawable) {
+            emptyLayout.setBackground(defaultBackgroundEmptyDrawable);
         }
 
         // 点击事件回调
@@ -360,10 +388,9 @@ public class StatusLayoutManager {
                 }
             });
         }
-
+        TextView emptyTextView = emptyLayout.findViewById(R.id.tv_status_empty_content);
         // 设置默认空数据布局的提示文本
         if (!TextUtils.isEmpty(emptyText)) {
-            TextView emptyTextView = emptyLayout.findViewById(R.id.tv_status_empty_content);
             if (emptyTextView != null) {
                 emptyTextView.setText(emptyText);
             }
@@ -377,17 +404,16 @@ public class StatusLayoutManager {
             }
         }
 
-        TextView emptyClickViewTextView = emptyLayout.findViewById(DEFAULT_EMPTY_CLICKED_ID);
-        if (emptyClickViewTextView != null) {
+        if (emptyTextView != null) {
             // 设置点击按钮的文本和可见性
             if (isEmptyClickViewVisible) {
-                emptyClickViewTextView.setVisibility(View.VISIBLE);
+                emptyTextView.setVisibility(View.VISIBLE);
                 if (!TextUtils.isEmpty(emptyClickViewText)) {
-                    emptyClickViewTextView.setText(emptyClickViewText);
+                    emptyTextView.setText(emptyClickViewText);
                 }
-                emptyClickViewTextView.setTextColor(emptyClickViewTextColor);
+                emptyTextView.setTextColor(emptyClickViewTextColor);
             } else {
-                emptyClickViewTextView.setVisibility(View.GONE);
+                emptyTextView.setVisibility(View.GONE);
             }
         }
     }
@@ -397,6 +423,7 @@ public class StatusLayoutManager {
      *
      * @return 空数据布局
      */
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     public View getEmptyLayout() {
         createEmptyLayout();
         return emptyLayout;
@@ -405,6 +432,7 @@ public class StatusLayoutManager {
     /**
      * 显示空数据布局
      */
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     public void showEmptyLayout() {
         createEmptyLayout();
         replaceLayoutHelper.showStatusLayout(emptyLayout);
@@ -414,16 +442,20 @@ public class StatusLayoutManager {
     //------------------出错布局------------------
 
 
-
     /**
      * 创建出错布局
      */
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     private void createErrorLayout() {
         if (errorLayout == null) {
             errorLayout = inflate(errorLayoutID);
         }
-        if (errorLayoutID == DEFAULT_ERROR_LAYOUT_ID) {
+        if (errorLayoutID == DEFAULT_ERROR_LAYOUT_ID && isShowErrorBgColor) {
             errorLayout.setBackgroundColor(defaultBackgroundErrorColor);
+        }
+
+        if (errorLayoutID == DEFAULT_ERROR_LAYOUT_ID && isShowErrorBgDrawable) {
+            errorLayout.setBackground(defaultBackgroundErrorDrawable);
         }
 
         View view = errorLayout.findViewById(errorClickViewId);
@@ -436,10 +468,10 @@ public class StatusLayoutManager {
                 }
             });
         }
-
+        TextView errorTextView = errorLayout.findViewById(R.id.tv_status_error_content);
         // 设置默认出错布局的提示文本
         if (!TextUtils.isEmpty(errorText)) {
-            TextView errorTextView = errorLayout.findViewById(R.id.tv_status_error_content);
+
             if (errorTextView != null) {
                 errorTextView.setText(errorText);
             }
@@ -453,17 +485,16 @@ public class StatusLayoutManager {
             }
         }
 
-        TextView errorClickViewTextView = errorLayout.findViewById(DEFAULT_ERROR_CLICKED_ID);
-        if (errorClickViewTextView != null) {
+        if (errorTextView != null) {
             // 设置点击按钮的文本和可见性
             if (isErrorClickViewVisible) {
-                errorClickViewTextView.setVisibility(View.VISIBLE);
+                errorTextView.setVisibility(View.VISIBLE);
                 if (!TextUtils.isEmpty(errorClickViewText)) {
-                    errorClickViewTextView.setText(errorClickViewText);
+                    errorTextView.setText(errorClickViewText);
                 }
-                errorClickViewTextView.setTextColor(errorClickViewTextColor);
+                errorTextView.setTextColor(errorClickViewTextColor);
             } else {
-                errorClickViewTextView.setVisibility(View.GONE);
+                errorTextView.setVisibility(View.GONE);
             }
         }
     }
@@ -473,6 +504,7 @@ public class StatusLayoutManager {
      *
      * @return 出错布局
      */
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     public View getErrorLayout() {
         createErrorLayout();
         return errorLayout;
@@ -481,6 +513,7 @@ public class StatusLayoutManager {
     /**
      * 显示出错布局
      */
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     public void showErrorLayout() {
         createErrorLayout();
         replaceLayoutHelper.showStatusLayout(errorLayout);
@@ -542,6 +575,18 @@ public class StatusLayoutManager {
         private int defaultBackgroundEmptyColor;
         private int defaultBackgroundUnLoginColor;
 
+        private Drawable defaultBackgroundErrorDrawable;
+        private Drawable defaultBackgroundEmptyDrawable;
+        private Drawable defaultBackgroundUnLoginDrawable;
+
+        private boolean isShowErrorBgColor;
+        private boolean isShowEmptyBgColor;
+        private boolean isShowUnLoginBgColor;
+
+        private boolean isShowErrorBgDrawable;
+        private boolean isShowEmptyBgDrawable;
+        private boolean isShowUnLoginBgDrawable;
+
 
         private OnStatusChildClickListener onStatusChildClickListener;
 
@@ -575,11 +620,16 @@ public class StatusLayoutManager {
             this.defaultBackgroundErrorColor = contentLayout.getContext().getResources().getColor(DEFAULT_ERROR_BACKGROUND_COLOR);
             this.defaultBackgroundEmptyColor = contentLayout.getContext().getResources().getColor(DEFAULT_EMPTY_BACKGROUND_COLOR);
             this.defaultBackgroundUnLoginColor = contentLayout.getContext().getResources().getColor(DEFAULT_UNLOGIN_BACKGROUND_COLOR);
+
+            this.defaultBackgroundErrorDrawable = ContextCompat.getDrawable(contentLayout.getContext(), DEFAULT_DRAWABLE);
+            this.defaultBackgroundEmptyDrawable = ContextCompat.getDrawable(contentLayout.getContext(), DEFAULT_DRAWABLE);
+            this.defaultBackgroundUnLoginDrawable = ContextCompat.getDrawable(contentLayout.getContext(), DEFAULT_DRAWABLE);
+
+
         }
 
 
         //------------------加载中布局------------------
-
 
 
         /**
@@ -664,9 +714,7 @@ public class StatusLayoutManager {
         }
 
 
-
         //------------------空数据布局----------------------
-
 
 
         /**
@@ -690,7 +738,6 @@ public class StatusLayoutManager {
             this.emptyText = contentLayout.getContext().getResources().getString(emptyTextStrID);
             return this;
         }
-
 
 
         /**
@@ -790,14 +837,27 @@ public class StatusLayoutManager {
          */
         public Builder setEmptyBackgroundColor(int defaultEmptyBackgroundColor) {
             this.defaultBackgroundEmptyColor = defaultEmptyBackgroundColor;
+            this.isShowEmptyBgColor = true;
+            this.isShowEmptyBgDrawable = false;
             return this;
         }
 
 
+        /**
+         * 设置出错布局的背景颜色
+         *
+         * @param defaultBackgroundEmptyDrawable 默认布局的背景颜色
+         * @return 状态布局 Build 对象
+         */
+        public Builder setEmptyBackgroundDrawable(Drawable defaultBackgroundEmptyDrawable) {
+            this.defaultBackgroundEmptyDrawable = defaultBackgroundEmptyDrawable;
+            this.isShowEmptyBgDrawable = true;
+            this.isShowEmptyBgColor = false;
+            return this;
+        }
 
 
         //------------------未登录布局----------------------
-
 
 
         /**
@@ -821,7 +881,6 @@ public class StatusLayoutManager {
             this.unLoginText = contentLayout.getContext().getResources().getString(unLoginTextStrID);
             return this;
         }
-
 
 
         /**
@@ -890,6 +949,7 @@ public class StatusLayoutManager {
             return this;
         }
 
+
         /**
          * 设置未登录布局点击按钮是否可见
          *
@@ -921,16 +981,27 @@ public class StatusLayoutManager {
          */
         public Builder setUnLoginBackgroundColor(int defaultUnLoginBackgroundColor) {
             this.defaultBackgroundUnLoginColor = defaultUnLoginBackgroundColor;
+            this.isShowUnLoginBgColor = true;
+            this.isShowUnLoginBgDrawable = false;
             return this;
         }
 
 
-
+        /**
+         * 设置出错布局的背景颜色
+         *
+         * @param defaultBackgroundUnLoginDrawable 默认布局的背景颜色
+         * @return 状态布局 Build 对象
+         */
+        public Builder setUnLoginBackgroundDrawable(Drawable defaultBackgroundUnLoginDrawable) {
+            this.defaultBackgroundUnLoginDrawable = defaultBackgroundUnLoginDrawable;
+            this.isShowUnLoginBgDrawable = true;
+            this.isShowUnLoginBgColor = false;
+            return this;
+        }
 
 
         //------------------出错布局------------------
-
-
 
 
         /**
@@ -1076,9 +1147,24 @@ public class StatusLayoutManager {
          */
         public Builder setErrorBackgroundColor(int defaultErrorBackgroundColor) {
             this.defaultBackgroundErrorColor = defaultErrorBackgroundColor;
+            this.isShowErrorBgColor = true;
+            this.isShowErrorBgDrawable = false;
             return this;
         }
 
+
+        /**
+         * 设置出错布局的背景颜色
+         *
+         * @param defaultBackgroundErrorDrawable 默认布局的背景颜色
+         * @return 状态布局 Build 对象
+         */
+        public Builder setErrorBackgroundDrawable(Drawable defaultBackgroundErrorDrawable) {
+            this.defaultBackgroundErrorDrawable = defaultBackgroundErrorDrawable;
+            this.isShowErrorBgDrawable = true;
+            this.isShowErrorBgColor = false;
+            return this;
+        }
 
 
         /**
